@@ -24,9 +24,9 @@ class Watcher
 
     public function startWatching(Closure $callback)
     {
-        $watcher = new ResourceWatcher(new ResourceCacheMemory());
+        $watcher = new ResourceWatcher(new ResourceCacheMemory(), $this->finder, new Crc32ContentHash());
 
-        $watcher->setFinder($this->finder);
+//        $watcher->setFinder($this->finder);
 
         $this->loop->addPeriodicTimer(1 / 2, function () use ($watcher, $callback) {
             $watcher->findChanges();
