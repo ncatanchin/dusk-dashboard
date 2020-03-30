@@ -29,9 +29,10 @@ class Watcher
 //        $watcher->setFinder($this->finder);
 
         $this->loop->addPeriodicTimer(1 / 2, function () use ($watcher, $callback) {
-            $watcher->findChanges();
+//             $watcher->findChanges();
+            $resource_watcher =  $watcher->findChanges();
 
-            if ($watcher->hasChanges()) {
+            if ($resource_watcher->hasChanges()) {
                 call_user_func($callback);
             }
         });
