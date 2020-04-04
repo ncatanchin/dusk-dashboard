@@ -1,5 +1,5 @@
 {
-    "name": "benhuang1024/dusk-dashboard",
+    "name": "ncatanchin/dusk-dashboard",
     "description": "A beautiful dashboard for your Laravel Dusk tests",
     "keywords": [
         "beyondcode",
