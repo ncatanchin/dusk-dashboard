@@ -194,11 +194,15 @@
             },
 
             loadHtml: function(html) {
-                var iframeDocument = window.document.getElementById('iframe').contentWindow.document;
+                // var iframeDocument = window.document.getElementById('iframe').contentWindow.document;
+                var iframeDocument = window.document.getElementById('iframe');
+                iframeDocument.src = html;
 
-                iframeDocument.open('text/html', 'replace');
-                iframeDocument.write(html);
-                iframeDocument.close();
+                // .contentWindow.document;
+
+                // iframeDocument.open('text/html', 'replace');
+                // iframeDocument.write(html);
+                // iframeDocument.close();
 
                 setTimeout(function () {
                     this.highlightEvent(this.activeEvent);
@@ -260,7 +264,14 @@
                 }
 
                 if (message.name === 'dusk-failure') {
-                    this.events[(this.events.length -1 )].failure = message.data.message;
+                    // this.events[(this.events.length -1 )].failure = message.data.message;
+
+                    this.events = this.events.map((event, index) => (
+                        index === this.events.length - 1 ? {
+                            ...event,
+                            failure: message.data.message
+                        } : event
+                    ));
                 }
 
                 if (message.name === 'dusk-reset') {

@@ -3,6 +3,9 @@
 namespace BeyondCode\DuskDashboard\Dusk;
 
 use BeyondCode\DuskDashboard\BrowserActionCollector;
+use Laravel\Dusk\Component;
+use Laravel\Dusk\ElementResolver;
+
 
 class Browser extends \Laravel\Dusk\Browser
 {
@@ -17,6 +20,19 @@ class Browser extends \Laravel\Dusk\Browser
 
     /** @var BrowserActionCollector */
     protected $actionCollector;
+
+    /** @var string */
+    protected $testName;
+
+    public function __construct($driver, $resolver = null, $testName = null)
+    {
+        if ($testName) {
+            $this->testName = $testName;
+        }
+
+        parent::__construct($driver, $resolver);
+    }
+
 
     public function setActionCollector(BrowserActionCollector $collector)
     {
@@ -81,5 +97,38 @@ class Browser extends \Laravel\Dusk\Browser
         $this->driver->executeScript("jQuery('input[type=radio]').each(function() { jQuery(this).attr('checked', this.checked); });");
 
         $this->driver->executeScript("jQuery('select option').each(function() { jQuery(this).attr('selected', this.selected); });");
+    }
+
+    /**
+     * Execute a Closure with a scoped browser instance.
+     *
+     * @param  string  $selector
+     * @param  \Closure  $callback
+     * @return \Laravel\Dusk\Browser
+     */
+    public function with($selector, \Closure $callback)
+    {
+        $browser = new static(
+            $this->driver, new ElementResolver($this->driver, $this->resolver->format($selector))
+        );
+
+        $browser->setActionCollector(new BrowserActionCollector($this->testName));
+
+        if ($this->page) {
+            $browser->onWithoutAssert($this->page);
+        }
+
+        if ($selector instanceof Component) {
+            $browser->onComponent($selector, $this->resolver);
+        }
+
+        call_user_func($callback, $browser);
+
+        return $this;
+    }
+
+    protected function getTestName()
+    {
+        return class_basename(static::class);
     }
 }

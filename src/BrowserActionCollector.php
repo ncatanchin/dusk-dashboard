@@ -6,6 +6,8 @@ use BeyondCode\DuskDashboard\Console\StartDashboardCommand;
 use BeyondCode\DuskDashboard\Dusk\Browser;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class BrowserActionCollector
 {
@@ -25,17 +27,29 @@ class BrowserActionCollector
     {
         $path = parse_url($browser->driver->getCurrentURL(), PHP_URL_PATH) ?? '';
 
+        $dummyAction = $action;
+
         $action = new Action($action, $arguments, $browser->getCurrentPageSource(), $path);
 
         $action->setPreviousHtml($previousHtml);
+
+        $beforeKey = 'dusk/before-'.$this->testName.'.html';
+        Storage::disk('public')->put($beforeKey, $action->getPreviousHtml());
+
+        $htmlKey = 'dusk/'.$this->testName.'-'.$dummyAction.'.html';
+        Storage::disk('public')->put($htmlKey, $action->getHtml());
+        $htmlUrl = Storage::disk('public')->url($htmlKey);
+
 
         $this->pushAction('dusk-event', [
             'test' => $this->testName,
             'path' => $action->getPath(),
             'name' => $action->getName(),
             'arguments' => $action->getArguments(),
-            'before' => $action->getPreviousHtml(),
-            'html' => $action->getHtml(),
+            // 'before' => $action->getPreviousHtml(),
+            // 'html' => $action->getHtml(),
+            'before' => $beforeKey,
+            'html' => $htmlUrl,
         ]);
 
         $this->processPerformanceLog($browser);

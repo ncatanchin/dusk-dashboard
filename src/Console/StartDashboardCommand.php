@@ -109,7 +109,8 @@ class StartDashboardCommand extends Command
             $xml = simplexml_load_file(base_path('phpunit.dusk.xml'));
 
             foreach ($xml->testsuites->testsuite as $testsuite) {
-                $directories[] = (string) $testsuite->directory;
+                // $directories[] = base_path((string) $testsuite->directory);
+                $directories[] = base_path(trim((string) $testsuite->directory));
             }
         } else {
             $directories[] = base_path('tests/Browser');
