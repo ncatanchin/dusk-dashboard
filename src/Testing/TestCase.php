@@ -23,7 +23,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function newBrowser($driver)
     {
-        return new Browser($driver);
+        return new Browser($driver, null, $this->getTestName());
     }
 
     /**
