@@ -5,6 +5,7 @@ namespace BeyondCode\DuskDashboard;
 use Closure;
 use React\EventLoop\LoopInterface;
 use Symfony\Component\Finder\Finder;
+use Yosymfony\ResourceWatcher\Crc32ContentHash;
 use Yosymfony\ResourceWatcher\ResourceCacheMemory;
 use Yosymfony\ResourceWatcher\ResourceWatcher;
 use Yosymfony\ResourceWatcher\Crc32ContentHash;
@@ -25,15 +26,13 @@ class Watcher
 
     public function startWatching(Closure $callback)
     {
-        $watcher = new ResourceWatcher(new ResourceCacheMemory(), $this->finder, new Crc32ContentHash());
-
-//        $watcher->setFinder($this->finder);
+        $hashContent = new Crc32ContentHash();
+        $watcher = new ResourceWatcher(new ResourceCacheMemory(), $this->finder, $hashContent);
 
         $this->loop->addPeriodicTimer(1 / 2, function () use ($watcher, $callback) {
-//             $watcher->findChanges();
-            $resource_watcher =  $watcher->findChanges();
+            $watcher_result = $watcher->findChanges();
 
-            if ($resource_watcher->hasChanges()) {
+            if ($watcher_result->hasChanges()) {
                 call_user_func($callback);
             }
         });
